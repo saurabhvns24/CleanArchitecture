@@ -5,12 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.example.cleanarchitecturewithhilt.core.common.Resource
 import com.example.cleanarchitecturewithhilt.domain.usecase.GetAllCharacterUseCase
 import com.example.cleanarchitecturewithhilt.presentation.state.CharacterState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
-class CharacterViewModel(private val useCase: GetAllCharacterUseCase) : ViewModel() {
+@HiltViewModel
+class CharacterViewModel @Inject constructor(private val useCase: GetAllCharacterUseCase) :
+    ViewModel() {
     private val _characterState = MutableStateFlow(CharacterState())
     val characterState: StateFlow<CharacterState>
         get() = _characterState
@@ -20,7 +24,7 @@ class CharacterViewModel(private val useCase: GetAllCharacterUseCase) : ViewMode
     }
 
     private fun getAllCharacters() {
-        useCase.invoke().onEach {
+        useCase().onEach {
             when (it) {
                 is Resource.Loader -> {
                     _characterState.value = CharacterState().copy(loading = true)
